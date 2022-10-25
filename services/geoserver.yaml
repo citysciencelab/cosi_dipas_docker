@@ -1,0 +1,10 @@
+version: "3.7"
+services:
+
+  geoserver:
+    image: kartoza/geoserver:2
+
+  database:
+    extends:
+      file: ./postgres.yaml
+      service: postgres

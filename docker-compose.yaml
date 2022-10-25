@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+
+  cosi:
+    extends:
+      file: services/cosi.yaml
+      service: cosi
+
+  dipas:
+    extends:
+      file: services/dipas.yaml
+      service: dipas
+
+  osmtool:
+    extends:
+      file: services/osmtool.yaml
+      service: osmtool
+
+  geoserver:
+    extends:
+      file: services/geoserver.yaml
+      service: geoserver
+
+  open-route-service:
+    extends:
+      file: services/open-route-service.yaml
+      service: open-route-service
