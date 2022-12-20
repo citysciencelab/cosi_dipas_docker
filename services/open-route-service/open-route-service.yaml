@@ -1,5 +1,3 @@
-version: 3
-
 services:
   # More info at:
   # https://giscience.github.io/openrouteservice/installation/Installation-and-Usage.html

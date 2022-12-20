@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   ##GLUE##
   glue:
@@ -20,9 +18,9 @@ services:
       - php
     volumes:
       - ./code:/app:delegated
-      #- ../repository/.htaccess:/opt/bitnami/apache/conf/htaccess/.htaccess
+      - ./code/.htaccess:/opt/bitnami/apache/conf/htaccess/.htaccess
       - ./docker/apache/dipas_vhost.conf:/vhosts/my_vhost.conf:ro
-      #- /app/node_modules
+      #- ../cosi/code/dist:/app/:delegated
   php:
     container_name: "unitac_dipas_php"
     build:
@@ -41,12 +39,14 @@ services:
 
   ##DATABASE##
   database:
-    container_name: "unitac_dipas_postgres"
-    image: postgres:13.4
+    container_name: "unitac_dipas_postgis"
+    extends:
+      file: ../postgis/postgis.yaml
+      service: postgis
     volumes:
       - ./data/pg-data:/var/lib/postgresql/data:delegated
     env_file:
-      - ./configs/postgres
+      - ./configs/postgis
   database_frontend:
     container_name: "dipas_pgadmin"
     image: dpage/pgadmin4:5
