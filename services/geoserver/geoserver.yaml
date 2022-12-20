@@ -1,0 +1,22 @@
+version: 3
+
+services:
+  geoserver:
+    container_name: "unitac_geoserver"
+    image: kartoza/geoserver:2
+    depends_on:
+      - postgis
+    ports:
+      - 8080:8080
+    volumes:
+      - ./data:/opt/geoserver/data_dir
+    env_file:
+      - ./configs/geoserver
+
+  postgis:
+    container_name: "unitac_geoserver_postgis"
+    extends:
+      file: ../postgis/postgis.yaml
+      service: postgis
+      env_file:
+        - ./configs/postgis

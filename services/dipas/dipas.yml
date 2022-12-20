@@ -1,0 +1,77 @@
+version: '3'
+
+services:
+  ##GLUE##
+  glue:
+    container_name: "unitac_dipas_glue_nginx"
+    image: nginx:1.21
+    depends_on:
+      - apache
+    ports:
+      - "8089:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+
+  ##BACKEND##
+  apache:
+    container_name: "unitac_dipas_apache"
+    image: bitnami/apache:2.4.41
+    depends_on:
+      - php
+    volumes:
+      - ./code:/app:delegated
+      #- ../repository/.htaccess:/opt/bitnami/apache/conf/htaccess/.htaccess
+      - ./docker/apache/dipas_vhost.conf:/vhosts/my_vhost.conf:ro
+      #- /app/node_modules
+  php:
+    container_name: "unitac_dipas_php"
+    build:
+      context: ./php
+      dockerfile: Dockerfile-php
+    ports:
+      - "2222:22"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./code:/app:delegated
+      - ./docker/php/php.ini:/opt/bitnami/php/etc/conf.d/php.ini:ro
+      - ./docker/php/pg.ini:/opt/bitnami/php/etc/conf.d/pg.ini:ro
+    env_file:
+      - ./configs/backend_php
+
+  ##DATABASE##
+  database:
+    container_name: "unitac_dipas_postgres"
+    image: postgres:13.4
+    volumes:
+      - ./data/pg-data:/var/lib/postgresql/data:delegated
+    env_file:
+      - ./configs/postgres
+  database_frontend:
+    container_name: "dipas_pgadmin"
+    image: dpage/pgadmin4:5
+    ports:
+      - "8888:80"
+    env_file:
+      - ./configs/pgadmin
+
+  ##FRONTEND##
+  dipas_vue:
+    container_name: "unitac_dipas_vue"
+    build:
+      context: ./code
+      #dockerfile: ./dockerd9/vue/Dockerfile-vue
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./code:/usr/src/app/
+  githook:
+    build:
+      context: ./code
+      #dockerfile: ./dockerd9/githooks/Dockerfile.githooks
+    volumes:
+      - ./code/.git:/tmp/.git
+      - ./code/hooks:/tmp/hooks
+
+volumes:
+  dipas_d8_data:

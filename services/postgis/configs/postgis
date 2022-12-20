@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Schema:
+# ENVIRONEMNT_KEY=Value
+
+POSTGRES_DB=
+POSTGRES_USER=
+POSTGRES_PASS=
+
+ALLOW_IP_RANGE=
+
+FORCE_SSL=TRUE

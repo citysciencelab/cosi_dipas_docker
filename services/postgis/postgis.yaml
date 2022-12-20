@@ -1,0 +1,10 @@
+version: 3
+
+services:
+  postgis:
+    container_name: "unitac_postgis"
+    image: postgis:14
+    volumes:
+      - ./data/pg_data:/var/lib/postgresql
+    env_file:
+      - ./configs/postgis

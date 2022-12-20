@@ -1,0 +1,6 @@
+#/usr/bin/env bash
+
+# Schema:
+# ENVIRONEMNT_KEY=Value
+
+PHP_IDE_CONFIG=serverName=phpdebug
