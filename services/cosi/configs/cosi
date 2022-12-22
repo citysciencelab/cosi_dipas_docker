@@ -1,0 +1,4 @@
+#/usr/bin/env bash
+
+# Schema:
+# ENVIRONEMNT_KEY=Value

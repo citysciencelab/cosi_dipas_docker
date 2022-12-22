@@ -1,0 +1,19 @@
+FROM bitnami/apache:2.4.41
+
+USER root
+RUN apt-get update && apt-get install -y \
+		curl \
+		git \
+		vim \
+		wget 
+
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+USER root

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Schema:
+# ENVIRONEMNT_KEY=Value
+
+POSTGRES_DB=geoserver
+POSTGRES_USER=geoserver
+POSTGRES_PASS=geoserverpw
