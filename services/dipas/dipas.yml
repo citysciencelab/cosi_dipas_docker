@@ -5,6 +5,8 @@ services:
     image: nginx:1.21
     depends_on:
       - apache
+      - database
+      - dipas_vue
     ports:
       - "8089:80"
     volumes:
@@ -60,7 +62,7 @@ services:
     container_name: "unitac_dipas_vue"
     build:
       context: ./code
-      #dockerfile: ./dockerd9/vue/Dockerfile-vue
+      dockerfile: ./docker/vue/Dockerfile-vue
     ports:
       - "8081:8080"
     volumes:
@@ -68,10 +70,7 @@ services:
   githook:
     build:
       context: ./code
-      #dockerfile: ./dockerd9/githooks/Dockerfile.githooks
+      dockerfile: ./docker/githooks/Dockerfile.githooks
     volumes:
       - ./code/.git:/tmp/.git
       - ./code/hooks:/tmp/hooks
-
-volumes:
-  dipas_d8_data:
