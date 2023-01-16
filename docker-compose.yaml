@@ -1,4 +1,9 @@
 services:
+  masterportal:
+    extends:
+      file: services/masterportal/masterportal.yaml
+      service: masterportal
+
   cosi:
     extends:
       file: services/cosi/cosi.yaml
