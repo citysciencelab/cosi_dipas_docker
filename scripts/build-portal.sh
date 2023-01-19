@@ -28,6 +28,7 @@ docker-compose run --rm masterportal npm run buildPortal
 mv "services/masterportal/portals/$PORTAL" services/masterportal/portal.tmp
 mv services/masterportal/portal.tmp services/masterportal/portal
 
+#docker-compose run --rm masterportal npm install -g
 #docker-compose run --rm masterportal python -m http.server 3000
 
 # # mv files to webspace

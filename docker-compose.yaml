@@ -1,30 +1,122 @@
 services:
+  # PostGIS
+  postgis:
+    container_name: "unitac_postgis"
+    image: postgis:14
+    volumes:
+      - ./postgis/data/pg_data:/var/lib/postgresql
+    env_file:
+      - ./postgis/configs/postgis
+
+  # Masterportal
   masterportal:
-    extends:
-      file: services/masterportal/masterportal.yaml
-      service: masterportal
+    container_name: "unitac_cosi"
+    image: node:16.16
+    user: node
+    command: 'npm start'
+    working_dir: /home/node/workspace
+    volumes:
+      - ./masterportal/code:/home/node/workspace
+    env_file:
+      - ./masterportal/configs/masterportal
 
+  # CoSI
   cosi:
-    extends:
-      file: services/cosi/cosi.yaml
-      service: cosi
+    container_name: "unitac_cosi"
+    image: node:16
+    user: node
+    command: 'npm start'
+    working_dir: /home/node/workspace
+    volumes:
+      - ./cosi/code:/home/node/workspace
+    env_file:
+      - ./cosi/configs/cosi
 
+  # Dipas
   dipas:
-    extends:
-      file: services/dipas/dipas.yaml
-      service: dipas
+    container_name: "unitac_dipas_glue_nginx"
+    image: nginx:1.21
+    depends_on:
+      - postgis
+      - dipas_apache
+      - dipas_vue
+    ports:
+      - "8089:80"
+    volumes:
+      - ./dipas/docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+  dipas_apache:
+    container_name: "unitac_dipas_apache"
+    image: bitnami/apache:2.4.41
+    depends_on:
+      - dipas_php
+    volumes:
+      - ./dipas/code:/app:delegated
+      - ./dipas/code/.htaccess:/opt/bitnami/apache/conf/htaccess/.htaccess
+      - ./dipas/docker/apache/dipas_vhost.conf:/vhosts/my_vhost.conf:ro
+      #- ../cosi/code/dist:/app/:delegated
+  dipas_php:
+    container_name: "unitac_dipas_php"
+    build:
+      context: ./dipas/docker/php
+      dockerfile: ./dipas/docker/php/Dockerfile-php
+    ports:
+      - "2222:22"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./dipas/code:/app:delegated
+      - ./dipas/docker/php/php.ini:/opt/bitnami/php/etc/conf.d/php.ini:ro
+      - ./dipas/docker/php/pg.ini:/opt/bitnami/php/etc/conf.d/pg.ini:ro
+    env_file:
+      - ./dipas/configs/backend_php
+  dipas_database_frontend:
+    container_name: "dipas_pgadmin"
+    image: dpage/pgadmin4:5
+    ports:
+      - "8888:80"
+    env_file:
+      - ./dipas/configs/pgadmin
+  dipas_vue:
+    container_name: "unitac_dipas_vue"
+    build:
+      context: ./dipas/code
+      dockerfile: ./dipas/docker/vue/Dockerfile-vue
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./dipas/code:/usr/src/app/
+  dipas_githook:
+    build:
+      context: ./dipas/code
+      dockerfile: ./dipas/docker/githooks/Dockerfile.githooks
+    volumes:
+      - ./dipas/code/.git:/tmp/.git
+      - ./dipas/code/hooks:/tmp/hooks
 
+  # Geoserver
   geoserver:
-    extends:
-      file: services/geoserver/geoserver.yaml
-      service: geoserver
+    container_name: "unitac_geoserver"
+    image: kartoza/geoserver:2
+    depends_on:
+      - postgis
+    ports:
+      - 8080:8080
+    volumes:
+      - ./geoserver/data/geoserver:/opt/geoserver/data_dir
+    env_file:
+      - ./geoserver/configs/geoserver
 
-  open-route-service:
-    extends:
-      file: services/open-route-service/open-route-service.yaml
-      service: open-route-service
-
-  #osmtool:
-  #  extends:
-  #    file: services/osmtool/osmtool.yaml
-  #    service: osmtool
+  # Open Route Service
+  open_route_service:
+    container_name: "unitac_open-route-service"
+    image: openrouteservice/openrouteservice:latest
+    user: "${ORS_UID:-0}:${ORS_GID:-0}"
+    volumes:
+      - ./data/graphs:/ors-core/data/graphs
+      - ./data/elevation_cache:/ors-core/data/elevation_cache
+      - ./data/conf:/ors-conf
+      #- ./data/import/your_osm.pbf:/ors-core/data/osm_file.pbf
+      - ./logs/ors:/var/log/ors
+      - ./logs/tomcat:/usr/local/tomcat/logs
+    env_file:
+      - ./configs/open-route-service
