@@ -9,35 +9,25 @@
 PORTAL="${1:-cosi}"
 
 # Clone fresh version of masterportal
-rm -r services/masterportal/code
+rm -rf services/masterportal/code
 git clone git@github.com:citysciencelab/masterportal.git services/masterportal/code
 docker-compose run --rm masterportal npm install
 
 # Clone fresh version of CoSI and link it as addons into masterportal
-rm -r services/cosi/code
+rm -rf services/cosi/code services/masterportal/code/addons
 git clone git@github.com:citysciencelab/cosi.git services/cosi/code
 docker-compose run --rm cosi npm install # npm run postinstall
-ln -s services/cosi/code services/masterportal/addons
+cp -r services/cosi/code/. services/masterportal/code/addons
 
 # Clone fresh version of mpportalconfigs
-rm -r services/masterportal/portal services/masterportal/portal.tmp
-git clone git@github.com:citysciencelab/mpportalconfigs.git services/masterportal/portal
+rm -rf services/masterportal/code/portal services/masterportal/code/portal.tmp
+git clone git@github.com:citysciencelab/mpportalconfigs.git services/masterportal/code/portal
 
-# Build Portals and use defined Portal
+ Build Portals and use defined Portal
 docker-compose run --rm masterportal npm run buildPortal
-mv "services/masterportal/portals/$PORTAL" services/masterportal/portal.tmp
-mv services/masterportal/portal.tmp services/masterportal/portal
+mv "services/masterportal/code/portal/$PORTAL" services/masterportal/code/portal.tmp
+mv services/masterportal/code/portal.tmp services/masterportal/code/portal
 
-#docker-compose run --rm masterportal npm install -g
-#docker-compose run --rm masterportal python -m http.server 3000
-
-# # mv files to webspace
-# # or reference by symlink
-# # uncomment and edit if you want to move the files
-# sudo mv ./dist/build /var/www/cosi-qs/
-# sudo mv ./dist/mastercode /var/www/cosi-qs/
-# sudo mv ./dist/cosi /var/www/cosi-qs/
-
-# Nginx config vhost links to /var/www/cosi-qs/index.html
-
-# echo "successfully deployed"
+cp -r services/masterportal/code/dist/build/. services/masterportal/code/dist/temp
+cp -r services/masterportal/code/dist/mastercode services/masterportal/code/dist/temp
+cp -r services/masterportal/code/dist/cosi/. services/masterportal/code/dist/temp
