@@ -11,10 +11,13 @@ stop:
 
 restart: stop start
 
-install: install_cosi
+install: install_cosi install_dipas
 
 install_cosi:
 	docker-compose run --rm cosi npm install
+
+install_dipas:
+	docker-compose run --rm dipas_vue npm install
 
 setup:
 	bash scripts/build-portal.sh cosi
