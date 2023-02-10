@@ -1,6 +1,10 @@
-start:
-	#docker-compose up -d proxy
-	docker-compose up proxy masterportal geoserver
+start: stop start_cosi start_dipas
+
+start_cosi: stop
+	docker-compose up proxy postgis geoserver masterportal
+
+start_dipas: stop
+	docker-compose up proxy postgis geoserver dipas
 
 stop:
 	docker-compose down
