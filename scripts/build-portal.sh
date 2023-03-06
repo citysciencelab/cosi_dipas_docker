@@ -23,7 +23,7 @@ cp -r services/cosi/code/. services/masterportal/code/addons
 rm -rf services/masterportal/code/portal services/masterportal/code/portal.tmp
 git clone git@github.com:citysciencelab/mpportalconfigs.git services/masterportal/code/portal
 
- Build Portals and use defined Portal
+# Build Portals and use defined Portal
 docker-compose run --rm masterportal npm run buildPortal
 mv "services/masterportal/code/portal/$PORTAL" services/masterportal/code/portal.tmp
 mv services/masterportal/code/portal.tmp services/masterportal/code/portal
