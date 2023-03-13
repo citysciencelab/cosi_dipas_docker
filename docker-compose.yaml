@@ -26,6 +26,8 @@ services:
     working_dir: /home/node/workspace
     volumes:
       - ./services/masterportal/code:/home/node/workspace
+      - ../hcu-unitac-cosi:/home/node/workspace/addons
+      - ../hcu-mpportalconfigs/cosi:/home/node/workspace/portal
     env_file:
       - ./services/masterportal/configs/masterportal
 

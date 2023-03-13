@@ -22,12 +22,13 @@ install_dipas:
 setup:
 	bash scripts/build-portal.sh cosi
 
-setup_cosi:
-	rm -rf services/cosi/code services/masterportal/code/addons
-	git clone git@github.com:citysciencelab/cosi.git services/cosi/code
-	docker-compose run --rm cosi npm install
-	cp -r services/cosi/code/. services/masterportal/code/addons
+cosi_install:
+	docker-compose run --rm  masterportal npm install
+	docker-compose run --rm --workdir /home/node/workspace/addons masterportal npm install
 
-setup_dipas:
-	rm -rf services/dipas/code
-	git clone git@github.com:ubilabs/hcu-unitac-dipas.git services/dipas/code
+cosi_build:
+	docker-compose run --rm masterportal bash -c 'rm -r dist/temp && mkdir dist/temp'
+	docker-compose run --rm masterportal npm run buildPortal
+	docker-compose run --rm masterportal cp -r dist/cosi/. dist/temp
+	docker-compose run --rm masterportal cp -r dist/build/. dist/temp
+	docker-compose run --rm masterportal cp -r dist/mastercode dist/temp
