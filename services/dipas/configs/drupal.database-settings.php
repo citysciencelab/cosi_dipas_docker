@@ -4,8 +4,8 @@ return [
   'default' => [
     'default' => [
       'database' => 'dipas',
-      'username' => 'dipas',
-      'password' => 'dipas',
+      'username' => 'unitac',
+      'password' => 'unitac',
       'prefix' => '',
       'host' => 'postgis',
       'port' => '5432',

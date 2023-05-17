@@ -1,0 +1,7 @@
+#/usr/bin/env bash
+
+# Schema:
+# ENVIRONMENT_KEY=Value
+
+PGADMIN_DEFAULT_EMAIL=dipas@gv.hamburg.de
+PGADMIN_DEFAULT_PASSWORD=dipas

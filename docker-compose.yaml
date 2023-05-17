@@ -3,35 +3,45 @@ services:
   proxy:
     image: nginx:stable
     ports:
-      - "3000:80"
+      - '3000:80'
     volumes:
       - ./services/proxy/configs/default.conf:/etc/nginx/conf.d/default.conf
       - ./services/proxy/configs/vhosts:/etc/nginx/conf.d/sites-enabled
 
-  # PostGIS
   postgis:
-    container_name: "unitac_postgis"
     image: postgis/postgis:14-master
     volumes:
       - ./services/postgis/data/pg_data:/var/lib/postgresql
     env_file:
-      - ./services/postgis/configs/postgis
+      - ./services/postgis/config
 
-  # Masterportal
+  pgadmin:
+    image: dpage/pgadmin4:5
+    depends_on:
+      - postgis
+    ports:
+      - "8888:80"
+    env_file:
+      - ./services/pgadmin/config
+
   masterportal:
     container_name: "unitac_cosi"
     image: node:16.16
     user: node
+    expose:
+      - 3000
+    depends_on:
+      - proxy
     command: 'npx serve ./dist/temp'
+    # command: 'npm start'
     working_dir: /home/node/workspace
     volumes:
-      - ./services/masterportal/code:/home/node/workspace
+      - ../hcu-unitac-masterportal:/home/node/workspace
       - ../hcu-unitac-cosi:/home/node/workspace/addons
-      - ../hcu-mpportalconfigs/cosi:/home/node/workspace/portal
+      - ../hcu-mpportalconfigs/cosi:/home/node/workspace/portal/cosi
     env_file:
       - ./services/masterportal/configs/masterportal
 
-  # CoSI
   cosi:
     container_name: "unitac_cosi"
     image: node:16.16
@@ -43,33 +53,23 @@ services:
     env_file:
       - ./services/cosi/configs/cosi
 
-  # Dipas
-  dipas:
-    container_name: "unitac_dipas_glue_nginx"
-    image: nginx:1.21
-    depends_on:
-      - postgis
-      - dipas_apache
-      - dipas_vue
-    ports:
-      - "8089:80"
-    volumes:
-      - ./services/dipas/docker/nginx/nginx.conf:/etc/nginx/nginx.conf
-  dipas_apache:
-    container_name: "unitac_dipas_apache"
-    image: bitnami/apache:2.4.41
-    depends_on:
-      - dipas_php
-    volumes:
-      - ./services/dipas/code:/app:delegated
-      - ./services/dipas/code/.htaccess:/opt/bitnami/apache/conf/htaccess/.htaccess
-      - ./services/dipas/docker/apache/dipas_vhost.conf:/vhosts/my_vhost.conf:ro
-      #- ../cosi/code/dist:/app/:delegated
-  dipas_php:
-    container_name: "unitac_dipas_php"
+  #dipas_apache:
+  #  container_name: "unitac_dipas_apache"
+  #  image: bitnami/apache:2.4.41
+  #  depends_on:
+  #    - dipas_php
+  #  volumes:
+  #    - ./services/dipas/code:/app:delegated
+  #    - ./services/dipas/code/.htaccess:/opt/bitnami/apache/conf/htaccess/.htaccess
+  #    - ./services/dipas/docker/apache/dipas_vhost.conf:/vhosts/my_vhost.conf:ro
+  #    #- ../cosi/code/dist:/app/:delegated
+
+  dipas_backend:
     build:
       context: ./services/dipas/docker/php
       dockerfile: ./Dockerfile-php
+    depends_on:
+      - postgis
     ports:
       - "2222:22"
     extra_hosts:
@@ -77,33 +77,29 @@ services:
     volumes:
       - ./services/dipas/code:/app:delegated
       - ./services/dipas/configs/drupal.database-settings.php:/app/config/drupal.database-settings.php:delegated
-      - ./services/dipas/docker/php/php.ini:/opt/bitnami/php/etc/conf.d/php.ini:ro
-      - ./services/dipas/docker/php/pg.ini:/opt/bitnami/php/etc/conf.d/pg.ini:ro
+      #- ./services/dipas/docker/php/php.ini:/opt/bitnami/php/etc/conf.d/php.ini:ro
+      #- ./services/dipas/docker/php/pg.ini:/opt/bitnami/php/etc/conf.d/pg.ini:ro
     env_file:
       - ./services/dipas/configs/backend_php
-  dipas_database_frontend:
-    container_name: "dipas_pgadmin"
-    image: dpage/pgadmin4:5
-    ports:
-      - "8888:80"
-    env_file:
-      - ./services/dipas/configs/pgadmin
-  dipas_vue:
-    container_name: "unitac_dipas_vue"
+
+  dipas_frontend:
     image: node:10
+    depends_on:
+      - dipas_backend
     command: bash -c 'npm run serve'
     working_dir: /usr/src/app
     ports:
       - "8081:8081"
     volumes:
       - ./services/dipas/code:/usr/src/app/
-  dipas_githook:
-    build:
-      context: ./services/dipas/code
-      dockerfile: ./Dockerfile.githooks
-    volumes:
-      - ./services/dipas/code/.git:/tmp/.git
-      - ./services/dipas/code/hooks:/tmp/hooks
+
+  #dipas_githook:
+  #  build:
+  #    context: ./services/dipas/code
+  #    dockerfile: ./Dockerfile.githooks
+  #  volumes:
+  #    - ./services/dipas/code/.git:/tmp/.git
+  #    - ./services/dipas/code/hooks:/tmp/hooks
 
   # Geoserver
   geoserver:
