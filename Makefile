@@ -27,7 +27,7 @@ cosi_build:
 
 cosi_start: stop
 	docker-compose up -d proxy postgis geoserver
-	docker-compose run --rm --service-ports masterportal npx serve --listen http://0.0.0.0:3000 ./dist/temp
+	docker-compose run --rm --service-ports masterportal npx serve --listen tcp://0.0.0.0:3000 ./dist/temp
 
 dipas_install:
 	#docker-compose run --rm  masterportal npm install

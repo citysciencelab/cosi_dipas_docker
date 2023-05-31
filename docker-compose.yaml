@@ -25,11 +25,9 @@ services:
       - ./services/pgadmin/config
 
   masterportal:
-    container_name: "unitac_cosi"
+    hostname: cosi
     image: node:16.16
     user: node
-    expose:
-      - 3000
     depends_on:
       - proxy
     command: 'npx serve ./dist/temp'
