@@ -15,10 +15,11 @@ setup:
 
 cosi_install:
 	docker-compose run --rm  masterportal npm install
+	docker-compose run --rm  masterportal npx browserslist --update-db
 	docker-compose run --rm --workdir /home/node/workspace/addons masterportal npm install
 
 cosi_build:
-	docker-compose run --rm masterportal bash -c 'rm -r dist/temp && mkdir dist/temp'
+	docker-compose run --rm masterportal bash -c 'rm -rf dist/temp && mkdir dist/temp'
 	docker-compose run --rm masterportal npm run buildPortal
 	docker-compose run --rm masterportal cp -r dist/cosi/. dist/temp
 	docker-compose run --rm masterportal cp -r dist/build/. dist/temp

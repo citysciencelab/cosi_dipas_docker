@@ -40,7 +40,7 @@ services:
       - ../hcu-unitac-cosi:/home/node/workspace/addons
       - ../hcu-mpportalconfigs/cosi:/home/node/workspace/portal/cosi
     env_file:
-      - ./services/masterportal/configs/masterportal
+      - ./services/masterportal/config
 
   cosi:
     container_name: "unitac_cosi"
@@ -49,9 +49,9 @@ services:
     command: 'npm start'
     working_dir: /home/node/workspace
     volumes:
-      - ./services/cosi/code:/home/node/workspace
+      - ../hcu-unitac-cosi:/home/node/workspace
     env_file:
-      - ./services/cosi/configs/cosi
+      - ./services/cosi/config
 
   #dipas_apache:
   #  container_name: "unitac_dipas_apache"
