@@ -24,30 +24,18 @@ services:
     env_file:
       - ./services/pgadmin/config
 
-  masterportal:
+  cosi:
     hostname: cosi
     image: node:16.16
     user: node
     depends_on:
       - proxy
     command: 'npx serve ./dist/temp'
-    # command: 'npm start'
     working_dir: /home/node/workspace
     volumes:
       - ../hcu-unitac-masterportal:/home/node/workspace
       - ../hcu-unitac-cosi:/home/node/workspace/addons
       - ../hcu-mpportalconfigs/cosi:/home/node/workspace/portal/cosi
-    env_file:
-      - ./services/masterportal/config
-
-  cosi:
-    container_name: "unitac_cosi"
-    image: node:16.16
-    user: node
-    command: 'npm start'
-    working_dir: /home/node/workspace
-    volumes:
-      - ../hcu-unitac-cosi:/home/node/workspace
     env_file:
       - ./services/cosi/config
 
@@ -67,29 +55,32 @@ services:
       context: ./services/dipas/docker/php
       dockerfile: ./Dockerfile-php
     depends_on:
+      - proxy
       - postgis
     ports:
       - "2222:22"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./services/dipas/code:/app:delegated
+      - ../hcu-unitac-dipas:/app:delegated
       - ./services/dipas/configs/drupal.database-settings.php:/app/config/drupal.database-settings.php:delegated
-      #- ./services/dipas/docker/php/php.ini:/opt/bitnami/php/etc/conf.d/php.ini:ro
-      #- ./services/dipas/docker/php/pg.ini:/opt/bitnami/php/etc/conf.d/pg.ini:ro
+      - ./services/dipas/docker/php/php.ini:/opt/bitnami/php/etc/conf.d/php.ini:ro
+      - ./services/dipas/docker/php/pg.ini:/opt/bitnami/php/etc/conf.d/pg.ini:ro
     env_file:
       - ./services/dipas/configs/backend_php
 
   dipas_frontend:
     image: node:10
+    user: node
     depends_on:
+      - proxy
       - dipas_backend
     command: bash -c 'npm run serve'
-    working_dir: /usr/src/app
+    working_dir: /home/node/workspace
     ports:
       - "8081:8081"
     volumes:
-      - ./services/dipas/code:/usr/src/app/
+      - ../hcu-unitac-dipas:/home/node/workspace:delegated
 
   #dipas_githook:
   #  build:
