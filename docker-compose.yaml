@@ -52,20 +52,18 @@ services:
 
   dipas_backend:
     build:
-      context: ./services/dipas/docker/php
-      dockerfile: ./Dockerfile-php
+      context: ./services/dipas
+    working_dir: /app
+    command: apache2ctl start
     depends_on:
       - proxy
       - postgis
-    ports:
-      - "2222:22"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     volumes:
-      - ../hcu-unitac-dipas:/app:delegated
-      - ./services/dipas/configs/drupal.database-settings.php:/app/config/drupal.database-settings.php:delegated
-      - ./services/dipas/docker/php/php.ini:/opt/bitnami/php/etc/conf.d/php.ini:ro
-      - ./services/dipas/docker/php/pg.ini:/opt/bitnami/php/etc/conf.d/pg.ini:ro
+      - ../hcu-unitac-dipas:/app
+      - ./services/dipas/configs/drupal.database-settings.php:/app/config/drupal.database-settings.php
+      - ./services/dipas/docker/php/pg.ini:/etc/php/8.2/apache2/conf.d/99-pg.ini:ro
+      - ./services/dipas/docker/php/php.ini:/etc/php/8.2/apache2/conf.d/99-php.ini:ro
+      - ./services/dipas/docker/apache/dipas_vhost.conf:/etc/apache2/sites-available/dipas:ro
     env_file:
       - ./services/dipas/configs/backend_php
 
@@ -75,10 +73,8 @@ services:
     depends_on:
       - proxy
       - dipas_backend
-    command: bash -c 'npm run serve'
+    command: 'npm run serve'
     working_dir: /home/node/workspace
-    ports:
-      - "8081:8081"
     volumes:
       - ../hcu-unitac-dipas:/home/node/workspace:delegated
 

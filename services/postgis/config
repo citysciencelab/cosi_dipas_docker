@@ -3,7 +3,7 @@
 # Schema:
 # ENVIRONEMNT_KEY=Value
 
-POSTGRES_DB=
+POSTGRES_DB=dipas
 POSTGRES_USER=unitac
 POSTGRES_PASSWORD=unitac
 

@@ -30,8 +30,10 @@ cosi_start:
 	docker-compose run --rm --service-ports cosi npx serve --listen tcp://0.0.0.0:3000 ./dist/temp
 
 dipas_install:
+	docker-compose build dipas_backend
+	docker-compose run --rm  dipas_backend composer install
 	docker-compose run --rm  dipas_frontend npm install
 
 dipas_start:
 	docker-compose up -d proxy postgis geoserver
-	docker-compose up dipas_backend dipas_frontend
+	docker-compose up dipas_backend
