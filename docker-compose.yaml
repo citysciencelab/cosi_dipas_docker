@@ -54,7 +54,7 @@ services:
     build:
       context: ./services/dipas
     working_dir: /app
-    command: apache2ctl start
+    command: apache2ctl -D FOREGROUND
     depends_on:
       - proxy
       - postgis

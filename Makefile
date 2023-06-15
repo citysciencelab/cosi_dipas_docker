@@ -31,9 +31,10 @@ cosi_start:
 
 dipas_install:
 	docker-compose build dipas_backend
+	docker-compose run --rm  dipas_backend composer update
 	docker-compose run --rm  dipas_backend composer install
 	docker-compose run --rm  dipas_frontend npm install
 
 dipas_start:
 	docker-compose up -d proxy postgis geoserver
-	docker-compose up dipas_backend
+	docker-compose up dipas_frontend dipas_backend
