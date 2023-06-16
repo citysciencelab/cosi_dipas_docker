@@ -13,6 +13,9 @@ install_dipas:
 setup:
 	bash scripts/build-portal.sh cosi
 
+pgadmin:
+	docker-compose up pgadmin
+
 cosi_install:
 	docker-compose run --rm  cosi npm install
 	docker-compose run --rm  cosi npx browserslist --update-db

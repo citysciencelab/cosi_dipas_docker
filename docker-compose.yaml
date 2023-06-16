@@ -54,7 +54,8 @@ services:
     build:
       context: ./services/dipas
     working_dir: /app
-    command: apache2ctl -D FOREGROUND
+    user: root
+    command: bash -c 'apache2ctl start && tail -f /var/log/apache2/access.log'
     depends_on:
       - proxy
       - postgis
@@ -63,7 +64,7 @@ services:
       - ./services/dipas/configs/drupal.database-settings.php:/app/config/drupal.database-settings.php
       - ./services/dipas/docker/php/pg.ini:/etc/php/8.2/apache2/conf.d/99-pg.ini:ro
       - ./services/dipas/docker/php/php.ini:/etc/php/8.2/apache2/conf.d/99-php.ini:ro
-      - ./services/dipas/docker/apache/dipas_vhost.conf:/etc/apache2/sites-available/dipas:ro
+      - ./services/dipas/docker/apache/dipas_vhost.conf:/etc/apache2/sites-available/dipas.conf:ro
     env_file:
       - ./services/dipas/configs/backend_php
 
