@@ -11,7 +11,7 @@ services:
   postgis:
     image: postgis/postgis:14-master
     volumes:
-      - ./services/postgis/data/pg_data:/var/lib/postgresql
+      - ./services/postgis/data:/var/lib/postgresql/data
     env_file:
       - ./services/postgis/config
 
@@ -55,7 +55,7 @@ services:
       context: ./services/dipas
     working_dir: /app
     user: root
-    command: bash -c 'apache2ctl start && tail -f /var/log/apache2/access.log'
+    command: apache2ctl -D FOREGROUND
     depends_on:
       - proxy
       - postgis
