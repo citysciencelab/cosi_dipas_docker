@@ -33,38 +33,26 @@ services:
     command: 'npx serve ./dist/temp'
     working_dir: /home/node/workspace
     volumes:
-      - ../hcu-unitac-masterportal:/home/node/workspace
-      - ../hcu-unitac-cosi:/home/node/workspace/addons
-      - ../hcu-mpportalconfigs/cosi:/home/node/workspace/portal/cosi
+      - $REPO_PATH_MASTERPORTAL:/home/node/workspace
+      - $REPO_PATH_COSI:/home/node/workspace/addons
+      - $REPO_PATH_MPPORTALCONFIGS/cosi:/home/node/workspace/portal/cosi
     env_file:
       - ./services/cosi/config
-
-  #dipas_apache:
-  #  container_name: "unitac_dipas_apache"
-  #  image: bitnami/apache:2.4.41
-  #  depends_on:
-  #    - dipas_php
-  #  volumes:
-  #    - ./services/dipas/code:/app:delegated
-  #    - ./services/dipas/code/.htaccess:/opt/bitnami/apache/conf/htaccess/.htaccess
-  #    - ./services/dipas/docker/apache/dipas_vhost.conf:/vhosts/my_vhost.conf:ro
-  #    #- ../cosi/code/dist:/app/:delegated
 
   dipas_backend:
     build:
       context: ./services/dipas
     working_dir: /app
     user: root
-    command: apache2ctl -D FOREGROUND
+    command: bash -c 'apache2ctl start && tail -f -n1 /var/log/apache2/other_vhosts_access.log'
     depends_on:
       - proxy
       - postgis
     volumes:
-      - ../hcu-unitac-dipas:/app
+      - $REPO_PATH_DIPAS:/app
+      - ./services/dipas/configs/php:/etc/php/8.2/apache2/conf.d:ro
+      - ./services/dipas/configs/apache/dipas_vhost.conf:/etc/apache2/sites-available/dipas.conf:ro
       - ./services/dipas/configs/drupal.database-settings.php:/app/config/drupal.database-settings.php
-      - ./services/dipas/docker/php/pg.ini:/etc/php/8.2/apache2/conf.d/99-pg.ini:ro
-      - ./services/dipas/docker/php/php.ini:/etc/php/8.2/apache2/conf.d/99-php.ini:ro
-      - ./services/dipas/docker/apache/dipas_vhost.conf:/etc/apache2/sites-available/dipas.conf:ro
     env_file:
       - ./services/dipas/configs/backend_php
 
@@ -77,17 +65,8 @@ services:
     command: 'npm run serve'
     working_dir: /home/node/workspace
     volumes:
-      - ../hcu-unitac-dipas:/home/node/workspace:delegated
+      - $REPO_PATH_DIPAS:/home/node/workspace:delegated
 
-  #dipas_githook:
-  #  build:
-  #    context: ./services/dipas/code
-  #    dockerfile: ./Dockerfile.githooks
-  #  volumes:
-  #    - ./services/dipas/code/.git:/tmp/.git
-  #    - ./services/dipas/code/hooks:/tmp/hooks
-
-  # Geoserver
   geoserver:
     container_name: "unitac_geoserver"
     image: kartoza/geoserver:latest
@@ -96,11 +75,10 @@ services:
     depends_on:
       - postgis
     volumes:
-      - ./services/geoserver/data/geoserver:/opt/geoserver/data_dir
+      - ./services/geoserver/data:/opt/geoserver/data_dir
     env_file:
-      - ./services/geoserver/configs/geoserver
+      - ./services/geoserver/config
 
-  # Open Route Service
   #open_route_service:
   #  container_name: "unitac_open-route-service"
   #  image: openrouteservice/openrouteservice:latest
@@ -113,4 +91,4 @@ services:
   #    - ./logs/ors:/var/log/ors
   #    - ./logs/tomcat:/usr/local/tomcat/logs
   #  env_file:
-  #    - ./configs/open-route-service
+  #    - ./services/open-route-service/config

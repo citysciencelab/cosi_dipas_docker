@@ -1,3 +1,5 @@
+include .env
+
 start: stop cosi_start dipas_start
 
 stop:
@@ -5,13 +7,10 @@ stop:
 
 restart: start
 
-install: cosi_install dipas_install
-
-install_dipas:
-	docker-compose run --rm dipas_vue npm install
-
 setup:
 	bash scripts/build-portal.sh cosi
+
+install: cosi_install dipas_install
 
 pgadmin:
 	docker-compose up pgadmin
