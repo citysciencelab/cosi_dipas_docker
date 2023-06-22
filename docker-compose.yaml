@@ -50,7 +50,9 @@ services:
       - postgis
     volumes:
       - $REPO_PATH_DIPAS:/app
-      - ./services/dipas/configs/php:/etc/php/8.2/apache2/conf.d:ro
+      #- ./services/dipas/configs/php:/etc/php/8.2/apache2/conf.d:ro
+      - ./services/dipas/configs/php/99-pg.ini:/etc/php/8.2/apache2/conf.d/99-pg.ini:ro
+      - ./services/dipas/configs/php/99-php.ini:/etc/php/8.2/apache2/conf.d/99-php.ini:ro
       - ./services/dipas/configs/apache/dipas_vhost.conf:/etc/apache2/sites-available/dipas.conf:ro
       - ./services/dipas/configs/drupal.database-settings.php:/app/config/drupal.database-settings.php
     env_file:
