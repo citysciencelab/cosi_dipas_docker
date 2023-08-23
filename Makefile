@@ -30,10 +30,16 @@ cosi_start:
 	docker-compose run --rm --service-ports cosi npx serve --listen tcp://0.0.0.0:3000 ./dist/temp
 
 dipas_install:
-	docker-compose build dipas_backend
+	docker-compose build --pull dipas_backend
 	docker-compose run --rm  dipas_backend composer update
 	docker-compose run --rm  dipas_backend composer install
 	docker-compose run --rm  dipas_frontend npm install
+
+dipas_init:
+	docker-compose up -d proxy postgis geoserver
+	docker-compose run --rm dipas_backend bash /root/init-drupal.sh 1
+	docker-compose run --rm dipas_backend
+	docker-compose run --rm dipas_backend bash /root/init-drupal.sh 0
 
 dipas_start:
 	docker-compose up -d proxy postgis geoserver

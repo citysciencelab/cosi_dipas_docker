@@ -42,19 +42,19 @@ services:
   dipas_backend:
     build:
       context: ./services/dipas
-    working_dir: /app
+    working_dir: /var/www
     user: root
     command: bash -c 'apache2ctl start && tail -f -n1 /var/log/apache2/other_vhosts_access.log'
     depends_on:
       - proxy
       - postgis
     volumes:
-      - $REPO_PATH_DIPAS:/app
+      - $REPO_PATH_DIPAS:/var/www
       #- ./services/dipas/configs/php:/etc/php/8.2/apache2/conf.d:ro
       - ./services/dipas/configs/php/99-pg.ini:/etc/php/8.2/apache2/conf.d/99-pg.ini:ro
       - ./services/dipas/configs/php/99-php.ini:/etc/php/8.2/apache2/conf.d/99-php.ini:ro
       - ./services/dipas/configs/apache/dipas_vhost.conf:/etc/apache2/sites-available/dipas.conf:ro
-      - ./services/dipas/configs/drupal.database-settings.php:/app/config/drupal.database-settings.php
+      - ./services/dipas/configs/drupal.database-settings.php:/var/www/config/drupal.database-settings.php
     env_file:
       - ./services/dipas/configs/backend_php
 
