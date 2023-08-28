@@ -19,7 +19,7 @@ cosi_install:
 	docker-compose run --rm --workdir /home/node/workspace/addons cosi npm install
 
 cosi_build:
-	docker-compose run --rm cosi bash -c 'rm -rf dist/temp && mkdir dist/temp'
+	docker-compose run --rm cosi bash -c 'rm -rf dist/temp && mkdir -p dist/temp'
 	docker-compose run --rm cosi npm run buildPortal
 	docker-compose run --rm cosi cp -r dist/cosi/. dist/temp
 	docker-compose run --rm cosi cp -r dist/build/. dist/temp

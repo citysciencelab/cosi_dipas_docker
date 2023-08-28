@@ -30,7 +30,7 @@ services:
     user: node
     depends_on:
       - proxy
-    command: 'npx serve ./dist/temp'
+    command: 'npm run start'
     working_dir: /home/node/workspace
     volumes:
       - $REPO_PATH_MASTERPORTAL:/home/node/workspace
@@ -38,6 +38,8 @@ services:
       - $REPO_PATH_MPPORTALCONFIGS/cosi:/home/node/workspace/portal/cosi
     env_file:
       - ./services/cosi/config
+    ports:
+      - "9001"
 
   dipas_backend:
     build:
