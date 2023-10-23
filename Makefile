@@ -44,3 +44,7 @@ dipas_init:
 dipas_start:
 	docker-compose up -d proxy postgis geoserver
 	docker-compose up dipas_frontend dipas_backend
+
+deployment_start: stop
+	docker-compose up -d proxy postgis geoserver
+	docker-compose up cosi dipas_frontend dipas_backend geoserver
